@@ -1,0 +1,36 @@
+# depslib dependency file v1.0
+1506272756 source:/home/alex/CProjects/RNNImage/RNNImage/bmp.cpp
+
+1506295114 source:/home/alex/CProjects/RNNImage/RNNImage/main.cpp
+	<stdio.h>
+	<stdlib.h>
+
+1506281754 /home/alex/CProjects/RNNImage/RNNImage/main.h
+
+1506329287 /home/alex/CProjects/RNNImage/RNNImage/image.h
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+
+1506279395 /home/alex/CProjects/RNNImage/RNNImage/image.cpp
+	<stdlib.h>
+	<iostream>
+	"image.h"
+	<cmath>
+
+1506327356 source:/home/alex/CProjects/RNNImage/RNNImage/image.cpp
+	<stdlib.h>
+	<stdio.h>
+	"image.h"
+	<cmath>
+
+1506332201 source:/home/alex/CProjects/RNNImage/RNNImage/image.c
+	<stdio.h>
+	<stdlib.h>
+	"image.h"
+
+1506328989 source:/home/alex/CProjects/RNNImage/RNNImage/main.c
+	<stdio.h>
+	<stdlib.h>
+	"image.h"
+
