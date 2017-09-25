@@ -5,7 +5,10 @@
 #pragma pack(2)
 
 
-int *X;
+float *X;
+float *W;
+float *_W;
+int neuron_size;
 
 void  get_rgb_from_img(char* file){
     FILE *inFile;
@@ -56,9 +59,6 @@ void  get_rgb_from_img(char* file){
             }
             read += sizeof(Rgb);
 
-
-
-            //printf( "Pixel %d: %3d %3d %3d\n", i+1, pixel->red, pixel->green, pixel->blue );
             matrix[j][i].blue=pixel->blue;
             matrix[j][i].red=pixel->red;
             matrix[j][i].green=pixel->green;
@@ -84,30 +84,61 @@ void  get_rgb_from_img(char* file){
 void print_matrix(){
     for(int i=height-1;i>=0;i--){
         for(int j=0;j<width;j++){
-                float d=((float)matrix[i][j].red)*(2.0/255.0);
-            //printf("(%2F , %i , %i)\n",d,matrix[i][j].green,matrix[i][j].blue);
+            printf("(%i , %i , %i)\n",matrix[i][j].red,matrix[i][j].green,matrix[i][j].blue);
 
         }
-        //printf("\n");
+        printf("\n");
     }
 
 
 }
+
 void from_matrix_to_X(int block_x,int block_y){
+    float convert_value;
+
     int size=8;
-    X=(int *)malloc(size * size*sizeof(int));
+    neuron_size=size*size*3;
+    X=(float *)malloc(3*size * size*sizeof(float));
     int k=0;
     for(int i=0+block_y*size;i<(block_y+1)*size;i++){
         for(int j=0+block_x*size;j<(block_x+1)*size;j++){
-            X[k]=matrix[i][j].red;
+
+            convert_value=((matrix[i][j].red)/255.0)*2-1;
+            X[k]=convert_value;
             k++;
-            X[k]=matrix[i][j].green;
+
+            convert_value=((matrix[i][j].green)/255.0)*2-1;
+            X[k]=convert_value;
             k++;
-            X[k]=matrix[i][j].blue;
+
+            convert_value=((matrix[i][j].blue)/255.0)*2-1;
+            X[k]=convert_value;
             k++;
         }
     }
-    for(int i=0;i<size*size;i++)
-        printf("%i\n",X[i]);
+    /*for(int i=0;i<3*size*size;i++){
+        if(i%3==0)
+            printf("\n");
+        printf("%f ",X[i]);
+
+    }*/
+
+
+}
+
+void generate_W_and__W(){
+    W=(float *)malloc(neuron_size*sizeof(float));
+    _W=(float *)malloc(neuron_size*sizeof(float));
+
+    for(int i=0;i<neuron_size;i++){
+        W[i]=(((float)rand()/(float)(RAND_MAX)) * 2)-1;
+        _W[i]=(((float)rand()/(float)(RAND_MAX)) * 2)-1;
+    }
+
+    for(int i=0;i<neuron_size;i++){
+        printf(" %f  %f \n",W[i],_W[i]);
+
+    }
+
 
 }

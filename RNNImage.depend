@@ -7,7 +7,7 @@
 
 1506281754 /home/alex/CProjects/RNNImage/RNNImage/main.h
 
-1506336580 /home/alex/CProjects/RNNImage/RNNImage/image.h
+1506373138 /home/alex/CProjects/RNNImage/RNNImage/image.h
 	<stdio.h>
 	<string.h>
 	<stdlib.h>
@@ -24,12 +24,12 @@
 	"image.h"
 	<cmath>
 
-1506332201 source:/home/alex/CProjects/RNNImage/RNNImage/image.c
+1506373405 source:/home/alex/CProjects/RNNImage/RNNImage/image.c
 	<stdio.h>
 	<stdlib.h>
 	"image.h"
 
-1506336546 source:/home/alex/CProjects/RNNImage/RNNImage/main.c
+1506373421 source:/home/alex/CProjects/RNNImage/RNNImage/main.c
 	<stdio.h>
 	<stdlib.h>
 	"image.h"

@@ -39,20 +39,17 @@ typedef struct
     unsigned char red;
 } Rgb;
 
-typedef struct
-{
-    int blue_neuron;
-    int green_neuron;
-    int red_neuron;
-} Rgb_neuron;
 
 
 Rgb **matrix;
+
 unsigned int width;
 unsigned int height;
 
 void get_rgb_from_img(char* file);
 void print_matrix();
 void from_matrix_to_X(int block_x,int block_y);
+void generate_W_and__W();
+
 
 #endif // MAIN_H_INCLUDEDs
