@@ -5,7 +5,7 @@
 #pragma pack(2)
 
 
-
+int *X;
 
 void  get_rgb_from_img(char* file){
     FILE *inFile;
@@ -85,11 +85,29 @@ void print_matrix(){
     for(int i=height-1;i>=0;i--){
         for(int j=0;j<width;j++){
                 float d=((float)matrix[i][j].red)*(2.0/255.0);
-            printf("(%2F , %i , %i)\n",d,matrix[i][j].green,matrix[i][j].blue);
+            //printf("(%2F , %i , %i)\n",d,matrix[i][j].green,matrix[i][j].blue);
 
         }
-        printf("\n");
+        //printf("\n");
     }
 
+
+}
+void from_matrix_to_X(int block_x,int block_y){
+    int size=8;
+    X=(int *)malloc(size * size*sizeof(int));
+    int k=0;
+    for(int i=0+block_y*size;i<(block_y+1)*size;i++){
+        for(int j=0+block_x*size;j<(block_x+1)*size;j++){
+            X[k]=matrix[i][j].red;
+            k++;
+            X[k]=matrix[i][j].green;
+            k++;
+            X[k]=matrix[i][j].blue;
+            k++;
+        }
+    }
+    for(int i=0;i<size*size;i++)
+        printf("%i\n",X[i]);
 
 }
