@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include<time.h>
 #include "image.h"
 #pragma pack(2)
 
@@ -9,11 +10,11 @@ float *X;
 float *_X;
 float *dX;
 float *Y;
-float *_Y;
-float *W;
-float *_W;
-int neuron_size_first;
-int neuron_size_second;
+float **W;
+float **_W;
+
+int N;
+int P;
 
 
 void  get_rgb_from_img(char* file){
@@ -99,14 +100,14 @@ void print_matrix(){
 void from_matrix_to_X(int block_x,int block_y){
     float convert_value;
 
-    int size=8;
-    neuron_size_first=size*size*3;
-    neuron_size_second=size*size;
-    X=(float *)malloc(neuron_size_first*sizeof(float));
-    _X=(float *)malloc(neuron_size_first*sizeof(float));
-    Y=(float *)malloc(neuron_size_second*sizeof(float));
-    _Y=(float *)malloc(neuron_size_second*sizeof(float));
+    int size=2;
+    N=size*size*3;
+    P=size*size;
 
+    X=(float *)malloc(N*sizeof(float));
+    _X=(float *)malloc(N*sizeof(float));
+    dX=(float *)malloc(N*sizeof(float));
+    Y=(float *)malloc(P*sizeof(float));
 
 
     int k=0;
@@ -137,50 +138,154 @@ void from_matrix_to_X(int block_x,int block_y){
 }
 
 void generate_W_and__W(){
-    W=(float *)malloc(neuron_size_first*sizeof(float));
-    _W=(float *)malloc(neuron_size_first*sizeof(float));
+    W=(float *)malloc(N*sizeof(float));
+    for(int i = 0; i < N; i++)
+           W[i] = (float *)malloc(P * sizeof(float));
 
-    for(int i=0;i<neuron_size_first;i++){
-        W[i]=(((float)rand()/(float)(RAND_MAX)) * 2)-1;
-        _W[i]=(((float)rand()/(float)(RAND_MAX)) * 2)-1;
-    }
+    _W=(float *)malloc(P*sizeof(float));
+    for(int i = 0; i < P; i++)
+           _W[i] = (float *)malloc(N * sizeof(float));
+    srand(time(NULL));
+    for(int i=0;i<N;i++)
+       for(int j=0;j<P;j++)
+        W[i][j]=(((float)rand()/(float)(RAND_MAX)) * 2)-1;
+
+    for(int i=0;i<P;i++)
+       for(int j=0;j<N;j++)
+        _W[i][j]=(((float)rand()/(float)(RAND_MAX)) * 2)-1;
+
+
 
 }
 
 void countment_Y(){
-    for(int i=0;i<neuron_size_first;i++){
-        Y[i]=X[i]*W[i];
+    float y=0.0;
+    for(int i=0;i<P;i++){
+        for(int j=0;j<N;j++){
+            y+=(X[j]*W[j][i]);
+        }
+        Y[i]=y;
+        y=0.0;
     }
-    printf(" X           W           Y \n");
+    /*
+    printf("            W           \n");
 
-    for(int i=0;i<neuron_size_first;i++){
-        printf(" %f  %f  %f\n",X[i],W[i],Y[i]);
+    for(int i=0;i<N;i++){
+        for(int j=0;j<P;j++){
+            printf("%f  ",W[i][j]);
+        }
+        printf("\n");
 
     }
+
+    printf("            X          \n");
+    for(int i=0;i<N;i++){
+       printf(" %f    \n",X[i]);
+
+    }
+        printf("            Y          \n");
+    for(int i=0;i<P;i++){
+       printf(" %f    \n",Y[i]);
+
+    }*/
 
 }
 
+void countment__Y(){
+        printf("            \n");
+
+    float _x=0.0;
+    for(int i=0;i<N;i++){
+        for(int j=0;j<P;j++){
+            _x+=(Y[j]*_W[j][i]);
+        }
+        _X[i]=_x;
+        _x=0.0;
+    }
+    /*
+    printf("            _W           \n");
+
+    for(int i=0;i<P;i++){
+        for(int j=0;j<N;j++){
+            printf("%f  ",_W[i][j]);
+        }
+        printf("\n");
+
+    }
+
+    printf("            Y          \n");
+    for(int i=0;i<P;i++){
+       printf(" %f    \n",Y[i]);
+
+    }
+        printf("            _X          \n");
+    for(int i=0;i<N;i++){
+       printf(" %f    \n",_X[i]);
+
+    }*/
+
+}
+
+void countment_dX(){
+    for(int i=0;i<N;i++){
+        dX[i]=_X[i]-X[i];
+    }
+    /*printf(" dX    \n");
+
+    for(int i=0;i<N;i++){
+        printf(" %f\n",dX[i]);
+    }*/
+
+}
 void countment_increment_W(){
-    for(int i=0;i<neuron_size_first;i++){
-        Y[i]=X[i]*W[i];
+
+    float **Xt_dX;
+    float **Xt_dX__Wt;
+
+    for(int i=0;i<N;i++)
+        for(int j=0;j<1;j++)
+            X[i]=rand()%5+1;
+
+    for(int i=0;i<N;i++)
+        for(int j=0;j<1;j++)
+            dX[i]=rand()%5+1;
+
+
+    printf(" dX    \n");
+
+    for(int i=0;i<N;i++){
+        printf(" %f\n",dX[i]);
     }
-    printf(" X           W           Y \n");
 
-    for(int i=0;i<neuron_size_first;i++){
-        printf(" %f  %f  %f\n",X[i],W[i],Y[i]);
+    printf(" X    \n");
+
+    for(int i=0;i<N;i++){
+        printf(" %f\n",X[i]);
+    }
+
+
+
+
+    Xt_dX=(float *)malloc(N*sizeof(float));
+    for(int i = 0; i < N; i++)
+           Xt_dX[i] = (float *)malloc(N * sizeof(float));
+
+    Xt_dX__Wt=(float *)malloc(N*sizeof(float));
+    for(int i = 0; i < N; i++)
+           Xt_dX__Wt = (float *)malloc(P * sizeof(float));
+
+    for(int i=0;i<N;i++)
+            for(int j=0;j<N;j++)
+                Xt_dX[i][j]=X[i]*dX[j];
+
+    printf(" Xt_dX    \n");
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++)
+            printf(" %f  ",Xt_dX[i][j]);
+        printf("\n");
 
     }
 
-}
-void countment_increment__W(){
-    for(int i=0;i<neuron_size_first;i++){
-        Y[i]=X[i]*W[i];
-    }
-    printf(" X           W           Y \n");
 
-    for(int i=0;i<neuron_size_first;i++){
-        printf(" %f  %f  %f\n",X[i],W[i],Y[i]);
-
-    }
 
 }
