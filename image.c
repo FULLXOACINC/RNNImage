@@ -15,7 +15,8 @@ float **_W;
 
 int N;
 int P;
-
+int size;
+int block_count;
 
 void  get_rgb_from_img(char* file){
     FILE *inFile;
@@ -81,9 +82,12 @@ void  get_rgb_from_img(char* file){
     fclose(inFile);
     fclose(outFile);
 
+    size=2;
 
     width=info.width;
     height=info.height;
+    block_count=(int)(height/size)*(height/size);
+    printf("%i",block_count);
 }
 
 void print_matrix(){
@@ -97,12 +101,12 @@ void print_matrix(){
 
 }
 
-void from_matrix_to_X(int block_x,int block_y){
+void from_matrix_to_X(int index){
     float convert_value;
 
-    int size=2;
+    size=2;
     N=size*size*3;
-    P=size*size;
+    P=size*size+4;
 
     X=(float *)malloc(N*sizeof(float));
     _X=(float *)malloc(N*sizeof(float));
@@ -110,23 +114,25 @@ void from_matrix_to_X(int block_x,int block_y){
     Y=(float *)malloc(P*sizeof(float));
 
 
-    int k=0;
-    for(int i=0+block_y*size;i<(block_y+1)*size;i++){
-        for(int j=0+block_x*size;j<(block_x+1)*size;j++){
+        int k=0;
+        for(int i=0+block_y*size;i<(block_y+1)*size;i++){
+            for(int j=0+block_x*size;j<(block_x+1)*size;j++){
 
-            convert_value=((matrix[i][j].red)/255.0)*2-1;
-            X[k]=convert_value;
-            k++;
+                convert_value=((matrix[i][j].red)/255.0)*2-1;
+                X[k]=convert_value;
+                k++;
 
-            convert_value=((matrix[i][j].green)/255.0)*2-1;
-            X[k]=convert_value;
-            k++;
+                convert_value=((matrix[i][j].green)/255.0)*2-1;
+                X[k]=convert_value;
+                k++;
 
-            convert_value=((matrix[i][j].blue)/255.0)*2-1;
-            X[k]=convert_value;
-            k++;
+                convert_value=((matrix[i][j].blue)/255.0)*2-1;
+                X[k]=convert_value;
+                k++;
+            }
         }
     }
+
     /*for(int i=0;i<3*size*size;i++){
         if(i%3==0)
             printf("\n");
@@ -191,38 +197,16 @@ void countment_Y(){
 
 }
 
-void countment__Y(){
-        printf("            \n");
+void countment__X(){
+      //  printf("            \n");
 
-    float _x=0.0;
     for(int i=0;i<N;i++){
+        _X[i]=0.0;
         for(int j=0;j<P;j++){
-            _x+=(Y[j]*_W[j][i]);
+           _X[i]+=(Y[j]*_W[j][i]);
         }
-        _X[i]=_x;
-        _x=0.0;
-    }
-    /*
-    printf("            _W           \n");
-
-    for(int i=0;i<P;i++){
-        for(int j=0;j<N;j++){
-            printf("%f  ",_W[i][j]);
-        }
-        printf("\n");
 
     }
-
-    printf("            Y          \n");
-    for(int i=0;i<P;i++){
-       printf(" %f    \n",Y[i]);
-
-    }
-        printf("            _X          \n");
-    for(int i=0;i<N;i++){
-       printf(" %f    \n",_X[i]);
-
-    }*/
 
 }
 
@@ -230,11 +214,11 @@ void countment_dX(){
     for(int i=0;i<N;i++){
         dX[i]=_X[i]-X[i];
     }
-    /*printf(" dX    \n");
+    //printf(" dX    \n");
 
-    for(int i=0;i<N;i++){
-        printf(" %f\n",dX[i]);
-    }*/
+    //for(int i=0;i<N;i++){
+    //    printf(" %f %f %f\n",dX[i],_X[i],X[i]);
+   // }
 
 }
 void countment_increment_W(){
@@ -242,27 +226,12 @@ void countment_increment_W(){
     float **Xt_dX;
     float **Xt_dX__Wt;
 
-    for(int i=0;i<N;i++)
-        for(int j=0;j<1;j++)
-            X[i]=rand()%5+1;
-
-    for(int i=0;i<N;i++)
-        for(int j=0;j<1;j++)
-            dX[i]=rand()%5+1;
-
-
-    printf(" dX    \n");
-
+    printf("W(t)\n");
     for(int i=0;i<N;i++){
-        printf(" %f\n",dX[i]);
+        for(int j=0;j<P;j++)
+            printf(" %f \n",W[i][j]);
+        printf("\n");
     }
-
-    printf(" X    \n");
-
-    for(int i=0;i<N;i++){
-        printf(" %f\n",X[i]);
-    }
-
 
 
 
@@ -272,20 +241,136 @@ void countment_increment_W(){
 
     Xt_dX__Wt=(float *)malloc(N*sizeof(float));
     for(int i = 0; i < N; i++)
-           Xt_dX__Wt = (float *)malloc(P * sizeof(float));
+           Xt_dX__Wt[i] = (float *)malloc(P * sizeof(float));
 
     for(int i=0;i<N;i++)
             for(int j=0;j<N;j++)
                 Xt_dX[i][j]=X[i]*dX[j];
 
-    printf(" Xt_dX    \n");
+
     for(int i=0;i<N;i++){
-        for(int j=0;j<N;j++)
-            printf(" %f  ",Xt_dX[i][j]);
-        printf("\n");
+        for(int j=0;j<P;j++){
+            for(int k=0;k<N;k++){
+                Xt_dX__Wt[i][j]+=Xt_dX[i][k]*_W[j][k];
+            }
+
+        }
+    }
+
+    float A=0.01;
+
+    for(int i=0;i<N;i++){
+        for(int j=0;j<P;j++)
+            W[i][j]-=(A*Xt_dX__Wt[i][j]);
 
     }
 
+    printf("W(t+1)\n");
+    for(int i=0;i<N;i++){
+        for(int j=0;j<P;j++)
+            printf(" %f ",W[i][j]);
+        printf("\n");
+    }
+}
+
+void countment_increment__W(){
+
+    float **Yt_dX;
+
+
+    /*printf("_W(t)\n");
+    for(int i=0;i<P;i++){
+        for(int j=0;j<N;j++)
+            printf(" %f \n",_W[i][j]);
+        printf("\n");
+    }*/
+
+
+
+
+
+    Yt_dX=(float *)malloc(P*sizeof(float));
+    for(int i = 0; i < P; i++)
+           Yt_dX[i] = (float *)malloc(N * sizeof(float));
+
+
+
+    for(int i=0;i<P;i++)
+            for(int j=0;j<N;j++)
+                Yt_dX[i][j]=Y[i]*dX[j];
+
+
+
+    float A=0.01;
+
+    for(int i=0;i<P;i++){
+        for(int j=0;j<N;j++)
+            _W[i][j]-=(A*Yt_dX[i][j]);
+
+    }
+
+    /*printf("_W(t+1)\n");
+    for(int i=0;i<P;i++){
+        for(int j=0;j<N;j++)
+            printf(" %f \n",_W[i][j]);
+        printf("\n");
+    }*/
 
 
 }
+
+int function_E(const float e){
+    float E=0.0;
+    for(int i=0;i<N;i++)
+        E+=(float)(dX[i]*dX[i]);
+
+    //printf("%f  IT E\n",(float)(dX[0]*dX[0]));
+
+    if(E<e)
+        return 0;
+
+    return 1;
+}
+
+void start_lern(){
+    float e=0.01;
+    countment_Y();
+    countment__X();
+    countment_dX();
+    int k=0;
+    while(function_E(e)){
+                printf("dsdsds   %i     \n",k);
+
+        k++;
+        countment_increment_W();
+        countment_increment__W();
+        countment_Y();
+        countment__X();
+        countment_dX();
+    }
+    for(int i=0;i<N;i++)
+        printf("%f   %f \n",X[i],_X[i]);
+    convert_matrix_rgb(x,y);
+}
+void convert_matrix_rgb(int x,int y){
+    int k=0;
+    float convert_value;
+    for(int i=0+y*size;i<(x+1)*size;i++){
+        for(int j=0+x*size;j<(x+1)*size;j++){
+
+            convert_value=((_X[k]+1)/2.0)*255.0;
+            matrix[i][j].red=convert_value;
+            k++;
+
+            convert_value=((_X[k]+1)/2.0)*255.0;
+            matrix[i][j].green=convert_value;
+            k++;
+
+            convert_value=((_X[k]+1)/2.0)*255.0;
+            matrix[i][j].blue=convert_value;
+            k++;
+        }
+    }
+
+}
+

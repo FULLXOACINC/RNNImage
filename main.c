@@ -8,18 +8,16 @@
 int main( ) {
 
 
-    get_rgb_from_img("test.bmp");
+    get_rgb_from_img("test2.bmp");
 
-
-    from_matrix_to_X(0,0);
     generate_W_and__W();
-    countment_Y();
-    countment__Y();
-    countment_dX();
 
-countment_increment_W();
+    from_matrix_to_X();
 
-    //print_matrix();
+    //start_lern(0,0);
+
+
+
     return 0;
 
 }
