@@ -6,9 +6,15 @@
 
 
 float *X;
+float *_X;
+float *dX;
+float *Y;
+float *_Y;
 float *W;
 float *_W;
-int neuron_size;
+int neuron_size_first;
+int neuron_size_second;
+
 
 void  get_rgb_from_img(char* file){
     FILE *inFile;
@@ -51,7 +57,7 @@ void  get_rgb_from_img(char* file){
 
     int read, j;
     for(j=0; j<info.height; j++ ) {
-        printf( "------ Row %d\n", j+1 );
+        //printf( "------ Row %d\n", j+1 );
         read = 0;
         for(i=0; i<info.width; i++ ) {
             if( fread(pixel, 1, sizeof(Rgb), inFile) != sizeof(Rgb) ) {
@@ -65,18 +71,16 @@ void  get_rgb_from_img(char* file){
         }
         if( read % 4 != 0 ) {
             read = 4 - (read%4);
-            printf( "Padding: %d bytes\n", read );
+            //printf( "Padding: %d bytes\n", read );
             fread( pixel, read, 1, inFile );
         }
     }
 
-    printf( "Done.\n" );
+    //printf( "Done.\n" );
     fclose(inFile);
     fclose(outFile);
 
-    printf( "\nBMP-Info:\n" );
-    printf( "Width x Height: %i x %i\n", info.width, info.height );
-    printf( "Depth: %i\n", (int)info.bitDepth );
+
     width=info.width;
     height=info.height;
 }
@@ -85,7 +89,6 @@ void print_matrix(){
     for(int i=height-1;i>=0;i--){
         for(int j=0;j<width;j++){
             printf("(%i , %i , %i)\n",matrix[i][j].red,matrix[i][j].green,matrix[i][j].blue);
-
         }
         printf("\n");
     }
@@ -97,8 +100,15 @@ void from_matrix_to_X(int block_x,int block_y){
     float convert_value;
 
     int size=8;
-    neuron_size=size*size*3;
-    X=(float *)malloc(3*size * size*sizeof(float));
+    neuron_size_first=size*size*3;
+    neuron_size_second=size*size;
+    X=(float *)malloc(neuron_size_first*sizeof(float));
+    _X=(float *)malloc(neuron_size_first*sizeof(float));
+    Y=(float *)malloc(neuron_size_second*sizeof(float));
+    _Y=(float *)malloc(neuron_size_second*sizeof(float));
+
+
+
     int k=0;
     for(int i=0+block_y*size;i<(block_y+1)*size;i++){
         for(int j=0+block_x*size;j<(block_x+1)*size;j++){
@@ -127,18 +137,50 @@ void from_matrix_to_X(int block_x,int block_y){
 }
 
 void generate_W_and__W(){
-    W=(float *)malloc(neuron_size*sizeof(float));
-    _W=(float *)malloc(neuron_size*sizeof(float));
+    W=(float *)malloc(neuron_size_first*sizeof(float));
+    _W=(float *)malloc(neuron_size_first*sizeof(float));
 
-    for(int i=0;i<neuron_size;i++){
+    for(int i=0;i<neuron_size_first;i++){
         W[i]=(((float)rand()/(float)(RAND_MAX)) * 2)-1;
         _W[i]=(((float)rand()/(float)(RAND_MAX)) * 2)-1;
     }
 
-    for(int i=0;i<neuron_size;i++){
-        printf(" %f  %f \n",W[i],_W[i]);
+}
+
+void countment_Y(){
+    for(int i=0;i<neuron_size_first;i++){
+        Y[i]=X[i]*W[i];
+    }
+    printf(" X           W           Y \n");
+
+    for(int i=0;i<neuron_size_first;i++){
+        printf(" %f  %f  %f\n",X[i],W[i],Y[i]);
 
     }
 
+}
+
+void countment_increment_W(){
+    for(int i=0;i<neuron_size_first;i++){
+        Y[i]=X[i]*W[i];
+    }
+    printf(" X           W           Y \n");
+
+    for(int i=0;i<neuron_size_first;i++){
+        printf(" %f  %f  %f\n",X[i],W[i],Y[i]);
+
+    }
+
+}
+void countment_increment__W(){
+    for(int i=0;i<neuron_size_first;i++){
+        Y[i]=X[i]*W[i];
+    }
+    printf(" X           W           Y \n");
+
+    for(int i=0;i<neuron_size_first;i++){
+        printf(" %f  %f  %f\n",X[i],W[i],Y[i]);
+
+    }
 
 }

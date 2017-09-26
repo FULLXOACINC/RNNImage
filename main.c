@@ -13,6 +13,7 @@ int main( ) {
 
     from_matrix_to_X(0,0);
     generate_W_and__W();
+    countment_Y();
 
     //print_matrix();
     return 0;

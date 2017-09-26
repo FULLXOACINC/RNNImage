@@ -32,9 +32,13 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="image.cpp" />
+		<Unit filename="image.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="image.h" />
-		<Unit filename="main.cpp" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="main.h" />
 		<Extensions>
 			<envvars />
