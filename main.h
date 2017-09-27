@@ -5,20 +5,23 @@
 // CIEXYZTRIPLE stuff
 typedef int FXPT2DOT30;
 
-typedef struct {
+typedef struct
+{
     FXPT2DOT30 ciexyzX;
     FXPT2DOT30 ciexyzY;
     FXPT2DOT30 ciexyzZ;
 } CIEXYZ;
 
-typedef struct {
+typedef struct
+{
     CIEXYZ  ciexyzRed;
     CIEXYZ  ciexyzGreen;
     CIEXYZ  ciexyzBlue;
 } CIEXYZTRIPLE;
 
 // bitmap file header
-typedef struct {
+typedef struct
+{
     unsigned short bfType;
     unsigned int   bfSize;
     unsigned short bfReserved1;
@@ -27,7 +30,8 @@ typedef struct {
 } BITMAPFILEHEADER;
 
 // bitmap info header
-typedef struct {
+typedef struct
+{
     unsigned int   biSize;
     unsigned int   biWidth;
     unsigned int   biHeight;
@@ -55,7 +59,8 @@ typedef struct {
 } BITMAPINFOHEADER;
 
 // rgb quad
-typedef struct {
+typedef struct
+{
     unsigned char  rgbBlue;
     unsigned char  rgbGreen;
     unsigned char  rgbRed;
@@ -64,7 +69,8 @@ typedef struct {
 
 // read bytes
 template <typename Type>
-void read(std::ifstream &fp, Type &result, std::size_t size) {
+void read(std::ifstream &fp, Type &result, std::size_t size)
+{
     fp.read(reinterpret_cast<char*>(&result), size);
 }
 

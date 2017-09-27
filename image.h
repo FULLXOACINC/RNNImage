@@ -48,7 +48,7 @@ unsigned int height;
 
 void get_rgb_from_img(char* file);
 void print_matrix();
-void from_matrix_to_X(int block_x,int block_y);
+void from_matrix_to_X();
 void generate_W_and__W();
 
 

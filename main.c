@@ -5,16 +5,14 @@
 
 
 
-int main( ) {
+int main( )
+{
 
 
-    get_rgb_from_img("test2.bmp");
-
-    generate_W_and__W();
-
+    get_rgb_from_img("test4.bmp");
     from_matrix_to_X();
-
-    //start_lern(0,0);
+    printf("LOL\n");
+    start_lern();
 
 
 
