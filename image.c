@@ -69,7 +69,6 @@ void  get_rgb_from_img(char* file)
     int read, j;
     for(j=0; j<info.height; j++ )
     {
-        //printf( "------ Row %d\n", j+1 );
         read = 0;
         for(i=0; i<info.width; i++ )
         {
@@ -86,21 +85,19 @@ void  get_rgb_from_img(char* file)
         if( read % 4 != 0 )
         {
             read = 4 - (read%4);
-            //printf( "Padding: %d bytes\n", read );
             fread( pixel, read, 1, inFile );
         }
     }
 
-    //printf( "Done.\n" );
     fclose(inFile);
     fclose(outFile);
 
-    size=width;
-
+    //size=width;
+    size=2;
     width=info.width;
     height=info.height;
-    //block_count=(int)(height/size)*(height/size);
-    block_count=height;
+    block_count=(int)(height/size)*(height/size);
+    //block_count=height;
     printf("%i",block_count);
 }
 
@@ -122,11 +119,11 @@ void from_matrix_to_X()
 {
     float convert_value;
 
-    //N=size*size*3;
-    //P=size*size*2;
+    N=size*size*3;
+    P=size*size*2;
 
-    N=width*3;
-    P=width*6;
+    //N=width*3;
+    //P=width*6;
 
     X=(float **)malloc(block_count*sizeof(float*));
     for(int i = 0; i < block_count; i++)
@@ -160,10 +157,10 @@ void from_matrix_to_X()
     for(int i=0;i<block_count;i++)
         memset(dX[i],0,N * sizeof(float));
 
-    int block_y=1;
+    int block_y=0;
     int block_x=0;
     int k;
-    /*
+
     for(int z=0; z<block_count; z++)
     {
         k=0;
@@ -195,8 +192,8 @@ void from_matrix_to_X()
             //block_y++;
         }
 
-    }*/
-
+    }
+/*
     for(int z=0; z<block_count; z++)
     {
         k=0;
@@ -220,7 +217,7 @@ void from_matrix_to_X()
 
 
 
-    }
+    }*/
 
 
 
@@ -329,8 +326,12 @@ void countment_increment_W(int index)
         }
     }
 
-    float A=0.0001;
+    float A=0.0;
+    for(int i=0;i<N;i++)
+        A+=(X[index][i]*X[index][i]);
 
+    A=(1.0/(5.0*A));
+    //A=0.01;
     for(int i=0; i<N; i++)
     {
         for(int j=0; j<P; j++)
@@ -346,8 +347,12 @@ void countment_increment__W(int index)
         for(int j=0; j<N; j++)
             Yt_dX[i][j]=Y[index][i]*dX[index][j];
 
-    float A=0.0001;
+    float A=0.0;
+    for(int i=0;i<P;i++)
+        A+=(Y[index][i]*Y[index][i]);
 
+    A=(1.0/(5.0*A));
+    //A=0.01;
     for(int i=0; i<P; i++)
     {
         for(int j=0; j<N; j++)
@@ -381,7 +386,7 @@ int function_E(const float e)
 
 void start_lern()
 {
-    float e=10;
+    float e=20;
     generate_W_and__W();
 
     int k=0;
@@ -401,10 +406,12 @@ void start_lern()
 
     }while(function_E(e));
 
-
-    for(int index=0; index<3; index++)
+    getchar();
+    for(int index=0; index<block_count; index++)
         for(int i=0; i<N; i++)
-            printf("%f   %f \n",((X[index][i]+1)/2.0)*255.0,((_X[index][i]+1)/2.0)*255.0);
+            printf("%f    \n",(X[index][i]-_X[index][i]));
+
+            //printf("%f   %f \n",((X[index][i]+1)/2.0)*255.0,((_X[index][i]+1)/2.0)*255.0);
 //    convert_matrix_rgb(x,y);
 }
 /*

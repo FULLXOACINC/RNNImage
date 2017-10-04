@@ -11,7 +11,6 @@ int main( )
 
     get_rgb_from_img("test4.bmp");
     from_matrix_to_X();
-    printf("LOL\n");
     start_lern();
 
 
