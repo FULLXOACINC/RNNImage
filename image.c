@@ -98,7 +98,7 @@ void  get_rgb_from_img(char* file)
     height=info.height;
     block_count=(int)(height/size)*(height/size);
     //block_count=height;
-    printf("%i",block_count);
+    printf("%i\n",block_count);
 }
 
 void print_matrix()
@@ -120,7 +120,7 @@ void from_matrix_to_X()
     float convert_value;
 
     N=size*size*3;
-    P=size*size*2;
+    P=size*size*4;
 
     //N=width*3;
     //P=width*6;
@@ -189,7 +189,7 @@ void from_matrix_to_X()
         if(block_x>=(int)(height/size))
         {
             block_x=0;
-            //block_y++;
+            block_y++;
         }
 
     }
@@ -295,9 +295,7 @@ void countment_dX(int index)
         dX[index][i]=0;
         dX[index][i]=_X[index][i]-X[index][i];
     }
-    //printf(" dX   _X     X \n");
 
-    //printf(" %f %f %f %f\n",dX[index][0],_X[index][0],X[index][0],Y[index][0]);
 
 
 }
@@ -330,7 +328,7 @@ void countment_increment_W(int index)
     for(int i=0;i<N;i++)
         A+=(X[index][i]*X[index][i]);
 
-    A=(1.0/(5.0*A));
+    A=(1.0/(1.0*A));
     //A=0.01;
     for(int i=0; i<N; i++)
     {
@@ -351,7 +349,7 @@ void countment_increment__W(int index)
     for(int i=0;i<P;i++)
         A+=(Y[index][i]*Y[index][i]);
 
-    A=(1.0/(5.0*A));
+    A=(1.0/(1.0*A));
     //A=0.01;
     for(int i=0; i<P; i++)
     {
@@ -386,7 +384,7 @@ int function_E(const float e)
 
 void start_lern()
 {
-    float e=20;
+    float e=2;
     generate_W_and__W();
 
     int k=0;
@@ -405,39 +403,147 @@ void start_lern()
         }
 
     }while(function_E(e));
-
+    printf("%i\n",k);
     getchar();
+    int u=0;
     for(int index=0; index<block_count; index++)
         for(int i=0; i<N; i++)
-            printf("%f    \n",(X[index][i]-_X[index][i]));
+            u++;
 
-            //printf("%f   %f \n",((X[index][i]+1)/2.0)*255.0,((_X[index][i]+1)/2.0)*255.0);
-//    convert_matrix_rgb(x,y);
+    printf("%i\n",u);
+
+    convert_matrix_rgb();
 }
-/*
-void convert_matrix_rgb(int x,int y){
-    int k=0;
+
+void convert_matrix_rgb(){
+    int block_y=0;
+    int block_x=0;
+    int k;
+    int r=rand()%120;
     float convert_value;
-    for(int i=0+y*size;i<(x+1)*size;i++){
-        for(int j=0+x*size;j<(x+1)*size;j++){
+    for(int j=0; j<20; j++)
+    {
+            printf("(%i , %i , %i)\n",matrix[r][j].red,matrix[r][j].green,matrix[r][j].blue);
+    }
+    printf("NEW \n");
 
-            convert_value=((_X[k]+1)/2.0)*255.0;
-            matrix[i][j].red=convert_value;
-            k++;
 
-            convert_value=((_X[k]+1)/2.0)*255.0;
-            matrix[i][j].green=convert_value;
-            k++;
+    for(int z=0; z<block_count; z++)
+    {
+        k=0;
+        for(int i=0+block_y*size; i<(block_y+1)*size; i++)
+        {
+            for(int j=0+block_x*size; j<(block_x+1)*size; j++)
+            {
+                convert_value=(((_X[z][k]+1)/2.0)*255.0);
+                matrix[i][j].red=(int)convert_value;
+                k++;
 
-            convert_value=((_X[k]+1)/2.0)*255.0;
-            matrix[i][j].blue=convert_value;
-            k++;
+                convert_value=(((_X[z][k]+1)/2.0)*255.0);
+                matrix[i][j].green=(int)convert_value;
+                k++;
+
+                convert_value=(((_X[z][k]+1)/2.0)*255.0);
+                matrix[i][j].blue=(int)convert_value;
+                k++;
+            }
         }
+        //printf("\n%i %i %i",block_y,block_x,(int)(height/size));
+
+        block_x++;
+
+        if(block_x>=(int)(height/size))
+        {
+            block_x=0;
+            block_y++;
+        }
+
+    }
+    for(int j=0; j<20; j++)
+    {
+            printf("(%i , %i , %i)\n",matrix[r][j].red,matrix[r][j].green,matrix[r][j].blue);
     }
 
+
 }
 
-*/
+void create_bmp()
+{
+typedef struct
+    {
+    unsigned int   bfSize;
+    unsigned short bfReserved1;
+    unsigned short bfReserved2;      /* ... */
+    unsigned int   bfOffBits;
+    } BITMAPFILEHEADER;
+
+typedef struct                       /**** BMP file info structure ****/
+    {
+    unsigned int   biSize;           /* Size of info header */
+    int            biWidth;          /* Width of image */
+    int            biHeight;         /* Height of image */
+    unsigned short biPlanes;         /* Number of color planes */
+    unsigned short biBitCount;       /* Number of bits per pixel */
+    unsigned int   biCompression;    /* Type of compression to use */
+    unsigned int   biSizeImage;      /* Size of image data */
+    int            biXPelsPerMeter;  /* X pixels per meter */
+    int            biYPelsPerMeter;  /* Y pixels per meter */
+    unsigned int   biClrUsed;        /* Number of colors used */
+    unsigned int   biClrImportant;   /* Number of important colors */
+    } BITMAPINFOHEADER;
+
+BITMAPFILEHEADER bfh;
+BITMAPINFOHEADER bih;
+
+/* Magic number for file. It does not fit in the header structure due to alignment requirements, so put it outside */
+unsigned short bfType=0x4d42;
+bfh.bfReserved1 = 0;
+bfh.bfReserved2 = 0;
+bfh.bfSize = 2+sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER)+640*480*3;
+bfh.bfOffBits = 0x36;
+
+bih.biSize = sizeof(BITMAPINFOHEADER);
+bih.biWidth = width;
+bih.biHeight = height;
+bih.biPlanes = 1;
+bih.biBitCount = 24;
+bih.biCompression = 0;
+bih.biSizeImage = 0;
+bih.biXPelsPerMeter = 5000;
+bih.biYPelsPerMeter = 5000;
+bih.biClrUsed = 0;
+bih.biClrImportant = 0;
+
+FILE *file = fopen("res.bmp", "wb");
+if (!file)
+    {
+    printf("Could not write file\n");
+    return;
+    }
+
+/*Write headers*/
+fwrite(&bfType,1,sizeof(bfType),file);
+fwrite(&bfh, 1, sizeof(bfh), file);
+fwrite(&bih, 1, sizeof(bih), file);
+
+/*Write bitmap*/
+for (int y = 0; y<bih.biHeight; y++) /*Scanline loop backwards*/
+    {
+    for (int x = 0; x < bih.biWidth; x++) /*Column loop forwards*/
+        {
+        /*compute some pixel values*/
+        unsigned char r = matrix[y][x].red;
+        unsigned char g = matrix[y][x].green;
+        unsigned char b = matrix[y][x].blue;
+        fwrite(&b, 1, 1, file);
+        fwrite(&g, 1, 1, file);
+        fwrite(&r, 1, 1, file);
+        }
+    }
+fclose(file);
+}
+
+
 
 
 

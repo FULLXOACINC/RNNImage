@@ -9,9 +9,10 @@ int main( )
 {
 
 
-    get_rgb_from_img("test4.bmp");
+    get_rgb_from_img("test2.bmp");
     from_matrix_to_X();
     start_lern();
+    create_bmp();
 
 
 
