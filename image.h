@@ -71,8 +71,12 @@ unsigned int height;
 
 void  get_rgb_from_img(char* file,int size_x,int size_y);
 void print_matrix();
-void from_matrix_to_X();
+void from_matrix_to_X(int P_size);
+void from__X_to_matrix();
 void generate_W_and__W();
+void start_lern(double e);
+void create_bmp();
+void print_res();
 
 
 #endif // MAIN_H_INCLUDEDs

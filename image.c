@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include<time.h>
+#include <time.h>
 #include "image.h"
 #pragma pack(2)
 
@@ -12,6 +12,7 @@ float **Y;
 float **W;
 float **_W;
 float **Xt_dX;
+float *dX__Wt;
 float **Xt_dX__Wt;
 float **Yt_dX;
 
@@ -55,12 +56,6 @@ void  get_rgb_from_img(char* file,int size_x,int size_y)
         }
     }
 
-    FILE *outFile = fopen( "hf", "wb" );
-    if( !outFile )
-    {
-        printf( "Error opening outputfile.\n" );
-    }
-
     Rgb *pixel = (Rgb*) malloc( sizeof(Rgb));
 
     matrix = (Rgb **)malloc(info.height * sizeof(Rgb *));
@@ -91,25 +86,22 @@ void  get_rgb_from_img(char* file,int size_x,int size_y)
     }
 
     fclose(inFile);
-    fclose(outFile);
 
-    //size=2;
     x_size=size_x;
     y_size=size_y;
     width=info.width;
     height=info.height;
     block_count=(int)(height/y_size)*(width/x_size);
-    printf("%i\n",block_count);
+    printf("L: %i\n",block_count);
 }
 
 
-void from_matrix_to_X()
+void from_matrix_to_X(int P_size)
 {
     float convert_value;
 
     N=y_size*x_size*3;
-    P=N-3;
-
+    P=P_size;
 
     X=(float **)malloc(block_count*sizeof(float*));
     for(int i = 0; i < block_count; i++)
@@ -128,6 +120,9 @@ void from_matrix_to_X()
     for(int i = 0; i < N; i++)
         Xt_dX[i] = (float *)malloc(N * sizeof(float));
 
+    dX__Wt=(float *)malloc(P*sizeof(float));
+    memset(dX__Wt,0,P * sizeof(float));
+
     Xt_dX__Wt=(float **)malloc(N*sizeof(float*));
     for(int i = 0; i < N; i++)
         Xt_dX__Wt[i] = (float *)malloc(P * sizeof(float));
@@ -142,6 +137,7 @@ void from_matrix_to_X()
         memset(Y[i],0,P * sizeof(float));
     for(int i=0;i<block_count;i++)
         memset(dX[i],0,N * sizeof(float));
+
 
     int block_y=0;
     int block_x=0;
@@ -204,14 +200,14 @@ void generate_W_and__W()
 
 }
 
-void countment_Y(int index)
+void countment_Y(const int  index)
 {
     for(int i=0; i<P; i++)
     {
         Y[index][i]=0;
         for(int j=0; j<N; j++)
         {
-            Y[index][i]+=(float)(X[index][j]*W[j][i]);
+            Y[index][i]+=(X[index][j]*W[j][i]);
 
         }
 
@@ -224,7 +220,7 @@ void countment_Y(int index)
 }
 
 
-void countment__X(int index)
+void countment__X(const int  index)
 {
     for(int i=0; i<N; i++)
     {
@@ -238,91 +234,71 @@ void countment__X(int index)
 
 }
 
-void countment_dX(int index)
+void countment_dX(const int index)
 {
     for(int i=0; i<N; i++)
     {
-        dX[index][i]=0;
         dX[index][i]=_X[index][i]-X[index][i];
     }
 
 
 
 }
-void countment_increment_W(int index)
+void countment_increment_W(const int  index)
 {
-
-
-    for(int i=0; i<N; i++)
-        for(int j=0; j<N; j++){
-            Xt_dX[i][j]=0;
-            Xt_dX[i][j]=X[index][i]*dX[index][j];
-        }
-
-
-
-    for(int i=0; i<N; i++)
-    {
-        for(int j=0; j<P; j++)
-        {
-            for(int k=0; k<N; k++)
-            {
-                Xt_dX__Wt[i][j]=0;
-                Xt_dX__Wt[i][j]+=Xt_dX[i][k]*_W[j][k];
-            }
-
-        }
-    }
-
-    float A=0.0;
+    float A=N*N;
     for(int i=0;i<N;i++)
         A+=(X[index][i]*X[index][i]);
 
-    A=(1.0/(5.0*A));
+    A=(1.0/(1.0*A));
+
+
+    for(int i=0; i<P; i++){
+        dX__Wt[i]=0.0;
+        for(int j=0; j<N; j++){
+            dX__Wt[i]+=dX[index][j]*_W[i][j];
+        }
+    }
+
     for(int i=0; i<N; i++)
     {
         for(int j=0; j<P; j++)
-            W[i][j]=W[i][j]-(A*Xt_dX__Wt[i][j]);
+            W[i][j]-=(A*X[index][i]*dX__Wt[j]);
 
     }
 
 }
 
-void countment_increment__W(int index)
+void countment_increment__W(const int  index)
 {
-    for(int i=0; i<P; i++)
-        for(int j=0; j<N; j++)
-            Yt_dX[i][j]=Y[index][i]*dX[index][j];
-
-    float A=0.0;
+    float A=N*N;
     for(int i=0;i<P;i++)
         A+=(Y[index][i]*Y[index][i]);
 
-    A=(1.0/(5.0*A));
+    A=(1.0/(1.0*A));
+
     for(int i=0; i<P; i++)
     {
         for(int j=0; j<N; j++)
-            _W[i][j]=_W[i][j]-(A*Yt_dX[i][j]);
+            _W[i][j]-=(A*Y[index][i]*dX[index][j]);
 
     }
 
 
-
-
 }
 
-int function_E(const float e)
+int function_E(double e)
 {
 
     float E=0.0;
     for(int index=0; index<block_count; index++)
     {
         for(int i=0; i<N; i++)
-            E+=(float)(dX[index][i]*dX[index][i]);
+            E+=(dX[index][i]*dX[index][i]);
     }
 
 
-    printf("Error =%f\n",E);
+    printf("Error = %f\n",E);
     if(E<e)
         return 0;
 
@@ -330,28 +306,27 @@ int function_E(const float e)
 }
 
 
-void start_lern()
+void start_lern(double e)
 {
-    float e=50;
     generate_W_and__W();
-
     int k=0;
     do
     {
         k++;
 
+
         for(int i=0; i<block_count; i++)
         {
-
             countment_Y(i);
             countment__X(i);
             countment_dX(i);
-            countment_increment_W(i);
             countment_increment__W(i);
+            countment_increment_W(i);
+
         }
 
     }while(function_E(e));
-    printf("%i\n",k);
+    printf("count iteration :%i\n",k);
     from__X_to_matrix();
 }
 
@@ -449,6 +424,27 @@ for (int y = 0; y<bih.biHeight; y++)
         }
     }
 fclose(file);
+}
+void print_res(){
+    printf("W:\n");
+    for(int i=0;i<N;i++){
+        for(int j=0;j<P;j++)
+            printf("%f ",W[i][j]);
+        printf("\n");
+
+    }
+    printf("W':\n");
+    for(int i=0;i<P;i++){
+        for(int j=0;j<N;j++)
+            printf("%f ",_W[i][j]);
+        printf("\n");
+
+    }
+
+    float f1=(N*block_count);
+    float f2=(N+block_count)*P+2.0;
+    printf("Z = %lf",(f1/f2));
+
 }
 
 

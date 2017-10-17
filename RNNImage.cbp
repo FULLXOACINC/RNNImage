@@ -32,6 +32,8 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-march=athlon64" />
+			<Add option="-O3" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
